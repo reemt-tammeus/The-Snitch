@@ -44,7 +44,7 @@ async function startApp(category) {
         state.category = category;
         state.rawPool = [];
 
-        // Logik für die Daten-Zuordnung (Mix-Mode repariert!)
+        // Logik für die Daten-Zuordnung (Mix-Mode repariert)
         if (category === "Mix-Mode") {
             // Alle Arrays aus der JSON zusammenwerfen, AUSSER Backshift
             Object.entries(data).forEach(([key, arr]) => {
@@ -53,15 +53,13 @@ async function startApp(category) {
                 }
             });
         } else {
-            // Versuche den genauen Namen zu finden, oder nutze Fallbacks
+            // Versuche den genauen Namen zu finden
             if (data[category]) {
                 state.rawPool = data[category];
             } else if (category === "Orders / Requests" && data["Commands"]) {
                 state.rawPool = data["Commands"];
             } else if (category === "Orders / Requests" && data["Orders and Requests"]) {
                 state.rawPool = data["Orders and Requests"];
-            } else if (category.includes("Warm-Up") && data["Statements_WarmUp"]) {
-                state.rawPool = data["Statements_WarmUp"];
             } else {
                 state.rawPool = data["Statements"] || []; 
             }
@@ -125,10 +123,17 @@ function renderDisplay() {
             </div>
         `;
     } else {
-        // Standard-Anzeige für Statements/Fragen
+        // HINT-LOGIK FÜR DEN WARM-UP MODE
+        let hintHTML = "";
+        if (task.hint) {
+            hintHTML = `<div style="color: #888; font-family: monospace; letter-spacing: 1.5px; font-size: 1.2rem; margin-bottom: 5px;">${task.hint}</div>`;
+        }
+
+        // Standard-Anzeige für Statements/Fragen inkl. Hint
         display.innerHTML = `
             <div style="font-style: italic; color: #aaa; margin-bottom: 10px;">"${task.direct}"</div>
             <div style="font-weight: bold; color: var(--orange); margin-bottom: 10px;">${task.prefix} ...</div>
+            ${hintHTML}
             <div id="answer-input-display" style="font-size: 1.2rem; min-height: 1.5em; border-bottom: 1px solid #fff;">
                 ${state.userInput}<span class="cursor">|</span>
             </div>
