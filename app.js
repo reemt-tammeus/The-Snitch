@@ -44,16 +44,13 @@ async function startApp(category) {
         state.category = category;
         state.rawPool = [];
 
-        // Logik für die Daten-Zuordnung (Mix-Mode repariert)
         if (category === "Mix-Mode") {
-            // Alle Arrays aus der JSON zusammenwerfen, AUSSER Backshift
             Object.entries(data).forEach(([key, arr]) => {
                 if (Array.isArray(arr) && key !== "Backshift of Time") {
                     state.rawPool = state.rawPool.concat(arr);
                 }
             });
         } else {
-            // Versuche den genauen Namen zu finden
             if (data[category]) {
                 state.rawPool = data[category];
             } else if (category === "Orders / Requests" && data["Commands"]) {
@@ -85,7 +82,6 @@ async function startApp(category) {
 }
 
 function prepareQueue() {
-    // Fisher-Yates Shuffle zum Mischen der Aufgaben
     state.activeQueue = [...state.rawPool].sort(() => Math.random() - 0.5);
 }
 
@@ -99,7 +95,6 @@ function loadNext() {
     state.userInput = "";
     document.getElementById('feedback-flash').classList.add('hidden');
     
-    // Nimm das nächste Item
     state.currentTask = state.activeQueue[state.blockCounter % state.activeQueue.length];
     
     renderDisplay();
@@ -110,7 +105,6 @@ function renderDisplay() {
     const display = document.getElementById('text-display');
     const task = state.currentTask;
 
-    // Spezial-Logik für Backshift (Lückentext)
     if (state.category === "Backshift of Time" && task.suffix) {
         display.innerHTML = `
             <div style="font-style: italic; color: #aaa; margin-bottom: 10px;">"${task.direct}"</div>
@@ -123,37 +117,43 @@ function renderDisplay() {
             </div>
         `;
     } else {
-        // HINT-LOGIK FÜR DEN WARM-UP MODE
         let hintHTML = "";
         if (task.hint) {
             hintHTML = `<div style="color: #888; font-family: monospace; letter-spacing: 1.5px; font-size: 1.2rem; margin-bottom: 5px;">${task.hint}</div>`;
         }
 
-        // Standard-Anzeige für Statements/Fragen inkl. Hint
+        let instructionHTML = "";
+        if (state.category === "Statements - Warm-Up-Mode") {
+            instructionHTML = `<div style="font-size: 0.85rem; color: #ffc107; margin-top: 12px; font-weight: normal; font-style: italic;">
+                ⚠️ Write the complete text, including given words.
+            </div>`;
+        }
+
         display.innerHTML = `
             <div style="font-style: italic; color: #aaa; margin-bottom: 10px;">"${task.direct}"</div>
             <div style="font-weight: bold; color: var(--orange); margin-bottom: 10px;">${task.prefix} ...</div>
             ${hintHTML}
-            <div id="answer-input-display" style="font-size: 1.2rem; min-height: 1.5em; border-bottom: 1px solid #fff;">
+            <div id="answer-input-display" style="font-size: 1.2rem; min-height: 1.5em; border-bottom: 1px solid #fff; padding-bottom: 4px;">
                 ${state.userInput}<span class="cursor">|</span>
             </div>
+            ${instructionHTML}
         `;
     }
 }
 
-// QWERTY ON-SCREEN KEYBOARD LOGIK
+// PERFEKTES QWERTY ON-SCREEN KEYBOARD LOGIK
 function renderKeyboard() {
     const zone = document.getElementById('input-controls');
-    zone.innerHTML = ""; // Clear
+    zone.innerHTML = ""; 
     
     const kbContainer = document.createElement('div');
     kbContainer.id = "keyboard";
     
-    // QWERTY Layout Rows
+    // QWERTY Layout Rows (Inkl. Enter-Taste in Reihe 3)
     const rows = [
         ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
         ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-        ["'", 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'backspace']
+        ['z', 'x', 'c', 'v', 'b', 'n', 'm', "'", 'check']
     ];
     
     rows.forEach((row, index) => {
@@ -162,10 +162,10 @@ function renderKeyboard() {
         
         row.forEach(key => {
             const btn = document.createElement('button');
-            if (key === 'backspace') {
-                btn.innerHTML = "⌫";
-                btn.className = "kb-key kb-backspace";
-                btn.onclick = () => handleInput("backspace");
+            if (key === 'check') {
+                btn.innerHTML = "↵"; // Enter-Symbol
+                btn.className = "kb-key kb-check";
+                btn.onclick = () => checkAnswer();
             } else {
                 btn.textContent = key.toUpperCase();
                 btn.className = "kb-key";
@@ -176,25 +176,25 @@ function renderKeyboard() {
         kbContainer.appendChild(rowDiv);
     });
 
-    // ACTION ROW (Space und Check getauscht)
+    // ACTION ROW (Space und Backspace in Reihe 4)
     const actionRow = document.createElement('div');
-    actionRow.className = "action-row";
+    actionRow.className = "kb-row row-4";
     
     const spaceBtn = document.createElement('button');
     spaceBtn.innerHTML = "SPACE";
-    spaceBtn.className = "kb-action-btn space-btn";
+    spaceBtn.className = "kb-key kb-space";
     spaceBtn.onclick = () => handleInput(" ");
 
-    const checkBtn = document.createElement('button');
-    checkBtn.innerHTML = "CHECK ➔";
-    checkBtn.className = "kb-action-btn enter-btn";
-    checkBtn.onclick = () => checkAnswer();
+    const backBtn = document.createElement('button');
+    backBtn.innerHTML = "⌫";
+    backBtn.className = "kb-key kb-backspace";
+    backBtn.onclick = () => handleInput("backspace");
     
     actionRow.appendChild(spaceBtn);
-    actionRow.appendChild(checkBtn);
+    actionRow.appendChild(backBtn);
     
+    kbContainer.appendChild(actionRow);
     zone.appendChild(kbContainer);
-    zone.appendChild(actionRow);
 }
 
 // HARDWARE KEYBOARD SUPPORT (Für PC-Tester)
@@ -235,8 +235,14 @@ function checkAnswer() {
     if (isCorrect) {
         state.streak++;
         state.blockCounter++;
-        showFlash("RICHTIG!", "flash-green");
-        setTimeout(loadNext, 1200);
+        
+        const glassBox = document.getElementById('playing-glass-box');
+        glassBox.classList.add('glow-green');
+        
+        setTimeout(() => {
+            glassBox.classList.remove('glow-green');
+            loadNext();
+        }, 1200);
     } else {
         state.lives--;
         state.streak = 0;
@@ -246,9 +252,9 @@ function checkAnswer() {
             setTimeout(() => {
                 document.getElementById('game-over-screen').classList.remove('hidden');
                 setTimeout(() => location.reload(), 3000);
-            }, 1500);
+            }, 2500);
         } else {
-            setTimeout(loadNext, 3000); 
+            setTimeout(loadNext, 4000); 
         }
     }
     updateStats();
@@ -266,7 +272,7 @@ function showFlash(m, c) {
     f.classList.remove('hidden');
 }
 
-// MENÜ START: Exakt die 6 vereinbarten Buttons generieren
+// MENÜ START
 document.addEventListener('DOMContentLoaded', () => {
     const menuGrid = document.getElementById('menu-grid');
     menuGrid.innerHTML = ""; 
