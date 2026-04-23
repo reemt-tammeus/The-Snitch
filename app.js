@@ -34,18 +34,40 @@ const AppDirector = {
     }
 };
 
-// INITIALISIERUNG & KATEGORIE-WAHL
-async function startApp(category, level = 1) {
+// INITIALISIERUNG & KATEGORIE-WAHL (Hier lag der Fehler!)
+async function startApp(category) {
     try {
         const response = await fetch('data.json');
+        if (!response.ok) throw new Error("Netzwerkantwort war nicht ok.");
         const data = await response.json();
         
-        // Pädagogische Firewall: Filtern nach Level
         state.category = category;
-        state.rawPool = data[category].filter(item => item.level <= level);
+        state.rawPool = [];
+
+        // Logik für die Daten-Zuordnung
+        if (category === "Mix-Mode") {
+            // Alle Arrays aus der JSON zusammenwerfen
+            Object.values(data).forEach(arr => {
+                if (Array.isArray(arr)) state.rawPool = state.rawPool.concat(arr);
+            });
+        } else {
+            // Versuche den genauen Namen zu finden, oder nutze Fallbacks
+            if (data[category]) {
+                state.rawPool = data[category];
+            } else if (category === "Orders / Requests" && data["Commands"]) {
+                state.rawPool = data["Commands"];
+            } else if (category === "Orders / Requests" && data["Orders and Requests"]) {
+                state.rawPool = data["Orders and Requests"];
+            } else if (category.includes("Warm-Up") && data["Statements_WarmUp"]) {
+                state.rawPool = data["Statements_WarmUp"];
+            } else {
+                // Fallback für Statements, falls die JSON anders heißt
+                state.rawPool = data["Statements"] || []; 
+            }
+        }
         
-        if (state.rawPool.length === 0) {
-            alert("Keine Aufgaben für dieses Level gefunden!");
+        if (!state.rawPool || state.rawPool.length === 0) {
+            alert(`Fehler: Keine Daten für "${category}" in der data.json gefunden! Bitte prüfe die Schreibweise in der JSON.`);
             return;
         }
 
@@ -58,17 +80,18 @@ async function startApp(category, level = 1) {
         AppDirector.changeScreen('playing');
         loadNext();
     } catch (e) {
-        console.error("Fehler beim Laden der JSON:", e);
+        console.error("Fehler beim Starten:", e);
+        alert("Fehler beim Laden der data.json! Öffnest du die index.html nur mit Doppelklick? (Du brauchst einen lokalen Server, z.B. VS Code Live Server, wegen CORS-Richtlinien des Browsers).");
     }
 }
 
 function prepareQueue() {
-    // Fisher-Yates Shuffle
+    // Fisher-Yates Shuffle zum Mischen der Aufgaben
     state.activeQueue = [...state.rawPool].sort(() => Math.random() - 0.5);
 }
 
 function loadNext() {
-    if (state.blockCounter >= state.blockLimit) {
+    if (state.blockCounter >= state.blockLimit || state.activeQueue.length === 0) {
         AppDirector.changeScreen('continue');
         return;
     }
@@ -77,7 +100,7 @@ function loadNext() {
     state.userInput = "";
     document.getElementById('feedback-flash').classList.add('hidden');
     
-    // Nimm das nächste Item (und rotiere die Queue)
+    // Nimm das nächste Item
     state.currentTask = state.activeQueue[state.blockCounter % state.activeQueue.length];
     
     renderDisplay();
@@ -105,7 +128,7 @@ function renderDisplay() {
         display.innerHTML = `
             <div style="font-style: italic; color: #aaa; margin-bottom: 10px;">"${task.direct}"</div>
             <div style="font-weight: bold; color: var(--orange); margin-bottom: 10px;">${task.prefix} ...</div>
-            <div id="answer-input-display" style="font-size: 1.2rem; min-height: 1.5em;">
+            <div id="answer-input-display" style="font-size: 1.2rem; min-height: 1.5em; border-bottom: 1px solid #fff;">
                 ${state.userInput}<span class="cursor">|</span>
             </div>
         `;
@@ -117,6 +140,7 @@ function renderKeyboard() {
     const zone = document.getElementById('input-controls');
     zone.innerHTML = ""; // Clear
     
+    // Tastaturbelegung
     const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ' ".split("");
     const kbContainer = document.createElement('div');
     kbContainer.id = "keyboard";
@@ -147,6 +171,19 @@ function renderKeyboard() {
     zone.appendChild(actionRow);
 }
 
+// HARDWARE KEYBOARD SUPPORT
+window.addEventListener('keydown', (e) => {
+    if (state.locked || !document.querySelector('[data-screen="playing"]').classList.contains('active')) return;
+    
+    if (e.key === "Backspace") {
+        handleInput("backspace");
+    } else if (e.key === "Enter") {
+        checkAnswer();
+    } else if (e.key.length === 1 && /[a-zA-Z' ]/.test(e.key)) {
+        handleInput(e.key.toLowerCase());
+    }
+});
+
 function handleInput(key) {
     if (state.locked) return;
     
@@ -165,7 +202,7 @@ function checkAnswer() {
     const task = state.currentTask;
     const correctAnswers = Array.isArray(task.answer) ? task.answer : [task.answer];
     
-    // Einfache Normalisierung für den Vergleich
+    // Überprüfung (ohne Levenshtein, da Grammatik-Drill exakt sein muss)
     const isCorrect = correctAnswers.some(a => 
         a.toLowerCase().trim() === state.userInput.toLowerCase().trim()
     );
@@ -186,7 +223,7 @@ function checkAnswer() {
                 setTimeout(() => location.reload(), 3000);
             }, 1500);
         } else {
-            setTimeout(loadNext, 2500);
+            setTimeout(loadNext, 3000); // Etwas mehr Zeit zum Lesen der Lösung
         }
     }
     updateStats();
@@ -204,10 +241,20 @@ function showFlash(m, c) {
     f.classList.remove('hidden');
 }
 
-// Menü-Buttons beim Start generieren
+// MENÜ START: Exakt die 6 vereinbarten Buttons generieren
 document.addEventListener('DOMContentLoaded', () => {
     const menuGrid = document.getElementById('menu-grid');
-    const categories = ["Backshift of Time", "Statements", "Questions", "Commands"];
+    menuGrid.innerHTML = ""; // Sicherheitshalber leeren
+
+    // Die 6 Kategorien (Anordnung 1-2-2-1 wird vom CSS übernommen)
+    const categories = [
+        "Backshift of Time",
+        "Statements - Warm-Up-Mode",
+        "Statements - Test-Prep-Mode",
+        "Questions",
+        "Orders / Requests",
+        "Mix-Mode"
+    ];
     
     categories.forEach(cat => {
         const btn = document.createElement('button');
