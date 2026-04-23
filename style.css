@@ -85,7 +85,7 @@ body {
 }
 
 .nav-mode { justify-content: flex-end; padding-bottom: 8vh; }
-.game-mode { justify-content: flex-start; padding-top: 5vh; }
+.game-mode { justify-content: flex-start; padding-top: 3vh; } /* Etwas höher geschoben für QWERTY */
 
 /* GLASSMORPHISM BOX */
 .glass-box { 
@@ -166,70 +166,96 @@ body {
 
 @keyframes blink { 50% { opacity: 0; } }
 
-/* THUMB-ZONE & KEYBOARD */
+/* THUMB-ZONE & QWERTY KEYBOARD */
 #thumb-zone {
     width: 100%;
     background: rgba(0,0,0,0.9);
-    padding: 15px 10px 30px 10px;
+    padding: 12px 6px 25px 6px; /* Kompakteres Padding */
     border-top: 1px solid var(--glass-border);
     z-index: 20;
 }
 
 #keyboard {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
-    margin-bottom: 15px;
+    flex-direction: column;
+    gap: 8px; /* Abstand zwischen den Reihen */
+    margin-bottom: 12px;
 }
 
-#keyboard button {
-    background: rgba(255,255,255,0.12);
+.kb-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px; /* Sehr kleiner Abstand, damit 10 Tasten passen */
+}
+
+.kb-row.row-2 { padding: 0 4%; } /* Typische Einrückung der A-L Reihe */
+.kb-row.row-3 { padding: 0 2%; } /* Platz für Backspace */
+
+.kb-key {
+    background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.1);
     color: white;
-    font-size: 1.2rem;
-    padding: 12px 0;
-    border-radius: 10px;
-    width: calc(14.28% - 5px); 
+    font-size: 1.3rem; /* Etwas größer für Lesbarkeit */
+    padding: 14px 0;
+    border-radius: 8px;
     cursor: pointer;
+    flex: 1; /* Tasten teilen sich den Platz gleichmäßig */
+    max-width: 10%; /* Verhindert, dass sie zu breit werden */
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: transform 0.05s;
 }
 
-#keyboard button:active {
+.kb-backspace {
+    background: rgba(255,255,255,0.25);
+    flex: 1.5; /* Backspace ist etwas breiter */
+    max-width: 15%;
+}
+
+.kb-key:active {
     background: var(--orange);
     color: #000;
+    transform: scale(0.92);
 }
 
+/* ACTION ROW (Space & Check) */
 .action-row {
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    padding: 0 2px;
 }
 
-.action-row button {
-    flex: 1;
-    padding: 18px;
-    border-radius: 16px;
+.kb-action-btn {
+    padding: 16px;
+    border-radius: 12px;
     border: none;
     font-weight: bold;
     font-size: 1.1rem;
     cursor: pointer;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     transition: transform 0.1s;
 }
 
-.action-row button:first-child {
-    background: #444;
-    color: white;
-    max-width: 80px;
+.space-btn {
+    background: rgba(255,255,255,0.15);
+    flex: 2.5; /* Riesige Leertaste! */
+    font-size: 1rem;
+    letter-spacing: 2px;
 }
 
 .enter-btn {
     background: var(--green);
-    color: white;
-    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    flex: 1; /* Normaler Button rechts */
 }
 
-.action-row button:active { transform: scale(0.95); }
+.kb-action-btn:active { 
+    transform: scale(0.95); 
+    background: var(--orange);
+    color: #000;
+}
 
-/* FEEDBACK FLASH (Repariert: max-width auf App-Größe begrenzt!) */
+/* FEEDBACK FLASH */
 #feedback-flash { 
     position: absolute; 
     top: 40%; 
