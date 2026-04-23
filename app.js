@@ -34,7 +34,7 @@ const AppDirector = {
     }
 };
 
-// INITIALISIERUNG & KATEGORIE-WAHL (Hier lag der Fehler!)
+// INITIALISIERUNG & KATEGORIE-WAHL
 async function startApp(category) {
     try {
         const response = await fetch('data.json');
@@ -44,11 +44,13 @@ async function startApp(category) {
         state.category = category;
         state.rawPool = [];
 
-        // Logik für die Daten-Zuordnung
+        // Logik für die Daten-Zuordnung (Mix-Mode repariert!)
         if (category === "Mix-Mode") {
-            // Alle Arrays aus der JSON zusammenwerfen
-            Object.values(data).forEach(arr => {
-                if (Array.isArray(arr)) state.rawPool = state.rawPool.concat(arr);
+            // Alle Arrays aus der JSON zusammenwerfen, AUSSER Backshift
+            Object.entries(data).forEach(([key, arr]) => {
+                if (Array.isArray(arr) && key !== "Backshift of Time") {
+                    state.rawPool = state.rawPool.concat(arr);
+                }
             });
         } else {
             // Versuche den genauen Namen zu finden, oder nutze Fallbacks
@@ -61,13 +63,12 @@ async function startApp(category) {
             } else if (category.includes("Warm-Up") && data["Statements_WarmUp"]) {
                 state.rawPool = data["Statements_WarmUp"];
             } else {
-                // Fallback für Statements, falls die JSON anders heißt
                 state.rawPool = data["Statements"] || []; 
             }
         }
         
         if (!state.rawPool || state.rawPool.length === 0) {
-            alert(`Fehler: Keine Daten für "${category}" in der data.json gefunden! Bitte prüfe die Schreibweise in der JSON.`);
+            alert(`Fehler: Keine Daten für "${category}" in der data.json gefunden!`);
             return;
         }
 
@@ -81,7 +82,7 @@ async function startApp(category) {
         loadNext();
     } catch (e) {
         console.error("Fehler beim Starten:", e);
-        alert("Fehler beim Laden der data.json! Öffnest du die index.html nur mit Doppelklick? (Du brauchst einen lokalen Server, z.B. VS Code Live Server, wegen CORS-Richtlinien des Browsers).");
+        alert("Fehler beim Laden der data.json! Nutzt du den Live-Server in VS Code?");
     }
 }
 
@@ -171,7 +172,7 @@ function renderKeyboard() {
     zone.appendChild(actionRow);
 }
 
-// HARDWARE KEYBOARD SUPPORT
+// HARDWARE KEYBOARD SUPPORT (Für PC-Tester)
 window.addEventListener('keydown', (e) => {
     if (state.locked || !document.querySelector('[data-screen="playing"]').classList.contains('active')) return;
     
@@ -202,7 +203,6 @@ function checkAnswer() {
     const task = state.currentTask;
     const correctAnswers = Array.isArray(task.answer) ? task.answer : [task.answer];
     
-    // Überprüfung (ohne Levenshtein, da Grammatik-Drill exakt sein muss)
     const isCorrect = correctAnswers.some(a => 
         a.toLowerCase().trim() === state.userInput.toLowerCase().trim()
     );
@@ -223,7 +223,7 @@ function checkAnswer() {
                 setTimeout(() => location.reload(), 3000);
             }, 1500);
         } else {
-            setTimeout(loadNext, 3000); // Etwas mehr Zeit zum Lesen der Lösung
+            setTimeout(loadNext, 3000); 
         }
     }
     updateStats();
@@ -244,9 +244,8 @@ function showFlash(m, c) {
 // MENÜ START: Exakt die 6 vereinbarten Buttons generieren
 document.addEventListener('DOMContentLoaded', () => {
     const menuGrid = document.getElementById('menu-grid');
-    menuGrid.innerHTML = ""; // Sicherheitshalber leeren
+    menuGrid.innerHTML = ""; 
 
-    // Die 6 Kategorien (Anordnung 1-2-2-1 wird vom CSS übernommen)
     const categories = [
         "Backshift of Time",
         "Statements - Warm-Up-Mode",
