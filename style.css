@@ -319,5 +319,5 @@ body {
 }
 
 .startup-fade {
-    animation: smoothFadeIn 1.5s ease-out forwards;
+    animation: smoothFadeIn 3s ease-out forwards; /* HIER auf 3s geändert */
 }
