@@ -280,11 +280,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuGrid = document.getElementById('menu-grid');
     menuGrid.innerHTML = ""; 
 
-    // Die 1,5 Sekunden Animation
+    // Die 3 Sekunden Animation
     const menuBox = document.querySelector('[data-screen="menu"] .glass-box');
     if (menuBox) {
         menuBox.classList.add('startup-fade');
-        setTimeout(() => menuBox.classList.remove('startup-fade'), 1600); 
+        setTimeout(() => menuBox.classList.remove('startup-fade'), 3100); // WICHTIG: Auf 3100 erhöht!
     }
 
     const categories = [
