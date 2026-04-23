@@ -141,37 +141,57 @@ function renderDisplay() {
     }
 }
 
-// ON-SCREEN KEYBOARD LOGIK
+// QWERTY ON-SCREEN KEYBOARD LOGIK
 function renderKeyboard() {
     const zone = document.getElementById('input-controls');
     zone.innerHTML = ""; // Clear
     
-    // Tastaturbelegung
-    const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ' ".split("");
     const kbContainer = document.createElement('div');
     kbContainer.id = "keyboard";
     
-    keys.forEach(key => {
-        const btn = document.createElement('button');
-        btn.textContent = key;
-        btn.onclick = () => handleInput(key.toLowerCase());
-        kbContainer.appendChild(btn);
+    // QWERTY Layout Rows
+    const rows = [
+        ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+        ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+        ["'", 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'backspace']
+    ];
+    
+    rows.forEach((row, index) => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = `kb-row row-${index + 1}`;
+        
+        row.forEach(key => {
+            const btn = document.createElement('button');
+            if (key === 'backspace') {
+                btn.innerHTML = "⌫";
+                btn.className = "kb-key kb-backspace";
+                btn.onclick = () => handleInput("backspace");
+            } else {
+                btn.textContent = key.toUpperCase();
+                btn.className = "kb-key";
+                btn.onclick = () => handleInput(key);
+            }
+            rowDiv.appendChild(btn);
+        });
+        kbContainer.appendChild(rowDiv);
     });
 
+    // ACTION ROW (Space und Check getauscht)
     const actionRow = document.createElement('div');
     actionRow.className = "action-row";
     
-    const backBtn = document.createElement('button');
-    backBtn.innerHTML = "⌫";
-    backBtn.onclick = () => handleInput("backspace");
+    const spaceBtn = document.createElement('button');
+    spaceBtn.innerHTML = "SPACE";
+    spaceBtn.className = "kb-action-btn space-btn";
+    spaceBtn.onclick = () => handleInput(" ");
+
+    const checkBtn = document.createElement('button');
+    checkBtn.innerHTML = "CHECK ➔";
+    checkBtn.className = "kb-action-btn enter-btn";
+    checkBtn.onclick = () => checkAnswer();
     
-    const enterBtn = document.createElement('button');
-    enterBtn.innerHTML = "CHECK ➔";
-    enterBtn.className = "enter-btn";
-    enterBtn.onclick = () => checkAnswer();
-    
-    actionRow.appendChild(backBtn);
-    actionRow.appendChild(enterBtn);
+    actionRow.appendChild(spaceBtn);
+    actionRow.appendChild(checkBtn);
     
     zone.appendChild(kbContainer);
     zone.appendChild(actionRow);
