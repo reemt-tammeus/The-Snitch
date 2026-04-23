@@ -85,7 +85,7 @@ body {
 }
 
 .nav-mode { justify-content: flex-end; padding-bottom: 8vh; }
-.game-mode { justify-content: flex-start; padding-top: 3vh; } /* Etwas höher geschoben für QWERTY */
+.game-mode { justify-content: flex-start; padding-top: 3vh; }
 
 /* GLASSMORPHISM BOX */
 .glass-box { 
@@ -170,7 +170,7 @@ body {
 #thumb-zone {
     width: 100%;
     background: rgba(0,0,0,0.9);
-    padding: 12px 6px 25px 6px; /* Kompakteres Padding */
+    padding: 12px 6px 25px 6px; 
     border-top: 1px solid var(--glass-border);
     z-index: 20;
 }
@@ -179,83 +179,75 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px; /* Abstand zwischen den Reihen */
-    margin-bottom: 12px;
+    margin-bottom: 5px;
+    width: 100%;
 }
 
 .kb-row {
     display: flex;
     justify-content: center;
-    gap: 4px; /* Sehr kleiner Abstand, damit 10 Tasten passen */
+    width: 100%;
+    gap: 6px; /* Abstand zwischen den Tasten */
 }
 
-.kb-row.row-2 { padding: 0 4%; } /* Typische Einrückung der A-L Reihe */
-.kb-row.row-3 { padding: 0 2%; } /* Platz für Backspace */
+/* Einrückungen für authentischen iOS-Look */
+.kb-row.row-2 { padding: 0 5%; } 
+.kb-row.row-3 { padding: 0 2%; } 
+.kb-row.row-4 { padding: 0 15%; gap: 12px; } /* Action Row (Space + Backspace) zentriert */
 
 .kb-key {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.2);
     border: 1px solid rgba(255,255,255,0.1);
     color: white;
-    font-size: 1.3rem; /* Etwas größer für Lesbarkeit */
+    font-size: 1.3rem; 
     padding: 14px 0;
     border-radius: 8px;
     cursor: pointer;
-    flex: 1; /* Tasten teilen sich den Platz gleichmäßig */
-    max-width: 10%; /* Verhindert, dass sie zu breit werden */
+    flex: 1; /* Automatische Breitenverteilung */
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    transition: transform 0.05s;
+    transition: transform 0.05s, background 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Spezifische Action Tasten */
+.kb-check {
+    background: var(--green);
+    flex: 1.2; /* Enter-Taste leicht breiter */
+    font-weight: bold;
+    font-size: 1.5rem; /* Größeres ↵ Symbol */
+}
+
+.kb-space {
+    flex: 4; /* Große Leertaste */
+    font-size: 1rem;
+    letter-spacing: 1px;
+    font-weight: bold;
 }
 
 .kb-backspace {
-    background: rgba(255,255,255,0.25);
-    flex: 1.5; /* Backspace ist etwas breiter */
-    max-width: 15%;
+    flex: 1.2;
+    background: rgba(220, 53, 69, 0.7); /* Weinroter Hintergrund wie im Bild */
+    font-size: 1.4rem;
 }
 
+/* Klick-Effekte */
 .kb-key:active {
-    background: var(--orange);
-    color: #000;
     transform: scale(0.92);
-}
-
-/* ACTION ROW (Space & Check) */
-.action-row {
-    display: flex;
-    gap: 8px;
-    padding: 0 2px;
-}
-
-.kb-action-btn {
-    padding: 16px;
-    border-radius: 12px;
-    border: none;
-    font-weight: bold;
-    font-size: 1.1rem;
-    cursor: pointer;
-    color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    transition: transform 0.1s;
-}
-
-.space-btn {
-    background: rgba(255,255,255,0.15);
-    flex: 2.5; /* Riesige Leertaste! */
-    font-size: 1rem;
-    letter-spacing: 2px;
-}
-
-.enter-btn {
-    background: var(--green);
-    flex: 1; /* Normaler Button rechts */
-}
-
-.kb-action-btn:active { 
-    transform: scale(0.95); 
     background: var(--orange);
     color: #000;
 }
 
-/* FEEDBACK FLASH */
+.kb-check:active {
+    background: #218838;
+}
+
+.kb-backspace:active {
+    background: #c82333;
+}
+
+/* FEEDBACK & OVERLAYS */
 #feedback-flash { 
     position: absolute; 
     top: 40%; 
@@ -273,8 +265,15 @@ body {
     pointer-events: none;
 }
 
-.flash-green { background: var(--green); color: white; border: 2px solid #fff; }
 .flash-red { background: var(--red); color: white; border: 2px solid #fff; }
+
+/* Grünes Aufleuchten der Box */
+.glow-green {
+    background: rgba(40, 167, 69, 0.3) !important;
+    border: 1.5px solid var(--green) !important;
+    box-shadow: 0 0 30px rgba(40, 167, 69, 0.6) !important;
+    transition: all 0.2s ease-in-out;
+}
 
 /* GAME OVER */
 #game-over-screen {
