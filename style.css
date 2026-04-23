@@ -1,5 +1,5 @@
 /* ==========================================
-   GRAMMARGRINDER - CHASSIS V1 (REPORTED SPEECH)
+   GRAMMARGRINDER - FINAL CSS (REPORTED SPEECH)
    ========================================== */
 
 :root {
@@ -7,13 +7,15 @@
     --green: #28a745;
     --red: #dc3545;
     --orange: #fd7e14;
+    --glass-bg: rgba(0, 0, 0, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.25);
 }
 
 * { 
     box-sizing: border-box; 
     margin: 0; 
     padding: 0; 
-    font-family: sans-serif; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
 }
 
 body { 
@@ -22,9 +24,10 @@ body {
     justify-content: center; 
     align-items: center; 
     min-height: 100vh; 
-    overflow: hidden; /* Verhindert Scrollen auf Mobile */
+    overflow: hidden; 
 }
 
+/* HAUPTCONTAINER MIT LOGO-HINTERGRUND */
 #app-container { 
     width: 100%; 
     max-width: 450px; 
@@ -33,14 +36,40 @@ body {
     flex-direction: column; 
     position: relative; 
     background-color: #000;
-    /* Optional: Dein Hintergrundbild falls gewünscht */
-    /* background-image: url('logo.jpg'); background-size: cover; background-position: center bottom; */
+    background-image: url('logo.jpg'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
 }
 
-/* ==========================================
-   FAHRSTUHL-LOGIK & SCREENS
-   ========================================== */
-#content-area { flex-grow: 1; position: relative; width: 100%; }
+/* STATS BAR */
+#stats-bar { 
+    padding: 15px 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%; 
+    background: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(10px); 
+    color: #fff;
+    z-index: 10;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+#btn-back {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+}
+
+/* CONTENT AREA & SCREENS */
+#content-area { 
+    flex-grow: 1; 
+    position: relative; 
+    width: 100%; 
+}
 
 .blueprint-screen { 
     position: absolute; 
@@ -50,115 +79,100 @@ body {
     flex-direction: column; 
     align-items: center; 
 }
-.blueprint-screen.active { display: flex; }
 
-/* Navigation klebt unten, Spiel klebt oben */
-.nav-mode { justify-content: flex-end; padding-bottom: 10vh; }
-.game-mode { justify-content: flex-start; padding-top: 6vh; }
+.blueprint-screen.active { 
+    display: flex; 
+}
 
+.nav-mode { justify-content: flex-end; padding-bottom: 8vh; }
+.game-mode { justify-content: flex-start; padding-top: 5vh; }
+
+/* GLASSMORPHISM BOX */
 .glass-box { 
-    width: 92%; 
-    padding: 25px 15px; 
-    background: rgba(0, 0, 0, 0.7); 
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px); 
-    border: 1.5px solid rgba(255,255,255,0.3); 
-    border-radius: 24px; 
+    width: 90%; 
+    padding: 25px 20px; 
+    background: var(--glass-bg); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px); 
+    border: 1.5px solid var(--glass-border); 
+    border-radius: 28px; 
     text-align: center; 
     color: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* ==========================================
-   STATS BAR & HEADER
-   ========================================== */
-#stats-bar { 
-    padding: 15px 20px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    width: 100%; 
-    background: rgba(0, 0, 0, 0.5); 
-    backdrop-filter: blur(8px); 
-    color: #fff;
-    z-index: 10;
-}
-
-#btn-back {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-/* ==========================================
-   MENÜ GRID (1-2-2-1)
-   ========================================== */
+/* MENÜ GRID (1-2-2-1) */
 .category-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 .category-grid button {
-    padding: 15px 10px;
+    padding: 16px 10px;
     background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
     color: #fff;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
+/* Spezifische Anordnung: Erster und letzter Button volle Breite */
 .category-grid button:first-child,
 .category-grid button:last-child {
     grid-column: span 2;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
+    font-size: 1rem;
     font-weight: bold;
-    font-size: 1.05rem;
 }
 
 .category-grid button:active {
+    transform: scale(0.96);
     background: var(--orange);
 }
 
-/* ==========================================
-   SPIELFELD & LÜCKENTEXT
-   ========================================== */
+/* TEXT DISPLAY & LÜCKENTEXT */
+#text-display {
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .gap-sentence {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     line-height: 1.6;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .input-gap {
     color: var(--orange);
     font-weight: bold;
-    border-bottom: 2px dashed var(--orange);
-    padding: 0 10px;
+    border-bottom: 3px solid var(--orange);
+    padding: 0 8px;
     display: inline-block;
-    min-width: 80px;
+    min-width: 100px;
+    text-shadow: 0 0 10px rgba(253, 126, 20, 0.3);
 }
 
 .cursor {
     animation: blink 1s step-end infinite;
     color: var(--orange);
+    font-weight: bold;
 }
 
-@keyframes blink {
-    50% { opacity: 0; }
-}
+@keyframes blink { 50% { opacity: 0; } }
 
-/* ==========================================
-   ON-SCREEN KEYBOARD (THUMBING ZONE)
-   ========================================== */
+/* THUMB-ZONE & KEYBOARD */
 #thumb-zone {
     width: 100%;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(10px);
-    padding: 15px 10px 25px 10px; /* Extra Padding unten für iOS/Swipe-Bar */
-    border-top: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.9);
+    padding: 15px 10px 30px 10px;
+    border-top: 1px solid var(--glass-border);
     z-index: 20;
 }
 
@@ -166,20 +180,19 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px;
-    margin-bottom: 12px;
+    gap: 5px;
+    margin-bottom: 15px;
 }
 
 #keyboard button {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.1);
     color: white;
-    font-size: 1.25rem;
-    padding: 10px 0;
-    border-radius: 8px;
+    font-size: 1.2rem;
+    padding: 12px 0;
+    border-radius: 10px;
+    width: calc(14.28% - 5px); /* 7 Tasten pro Reihe */
     cursor: pointer;
-    width: calc(14% - 6px); /* Passt ca. 7 Tasten pro Reihe */
-    text-align: center;
 }
 
 #keyboard button:active {
@@ -189,81 +202,55 @@ body {
 
 .action-row {
     display: flex;
-    justify-content: space-between;
     gap: 10px;
 }
 
 .action-row button {
     flex: 1;
-    padding: 15px;
-    border-radius: 12px;
+    padding: 18px;
+    border-radius: 16px;
     border: none;
     font-weight: bold;
     font-size: 1.1rem;
     cursor: pointer;
+    transition: transform 0.1s;
 }
 
 .action-row button:first-child {
-    background: rgba(255, 0, 0, 0.6);
+    background: #444;
     color: white;
-    flex: 0.3;
+    max-width: 80px;
 }
 
 .enter-btn {
     background: var(--green);
     color: white;
-    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
 }
 
-/* ==========================================
-   FEEDBACK & UTILS
-   ========================================== */
-.hidden { display: none !important; }
+.action-row button:active { transform: scale(0.95); }
 
+/* FEEDBACK FLASH */
 #feedback-flash { 
     position: absolute; 
-    top: 35%; 
+    top: 40%; 
     left: 50%; 
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     z-index: 100; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
-    width: 85%;
-    padding: 20px;
-    border-radius: 15px;
+    width: 80%;
+    padding: 25px;
+    border-radius: 20px;
     text-align: center;
     font-weight: bold;
-    font-size: 1.2rem;
-    animation: popIn 0.3s ease-out;
+    font-size: 1.3rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    pointer-events: none;
 }
 
-.flash-green { background-color: var(--green); color: white; }
-.flash-red { background-color: var(--red); color: white; }
+.flash-green { background: var(--green); color: white; border: 2px solid #fff; }
+.flash-red { background: var(--red); color: white; border: 2px solid #fff; }
 
-@keyframes popIn {
-    0% { transform: translate(-50%, 20px); opacity: 0; }
-    100% { transform: translate(-50%, 0); opacity: 1; }
-}
-
-/* Continue Screen Buttons */
-.mode-selection {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.action-btn {
-    padding: 15px;
-    border-radius: 25px;
-    border: none;
-    background: var(--orange);
-    color: white;
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-.action-btn.secondary {
-    background: transparent;
-    border: 2px solid rgba(255,255,255,0.3);
-}
-
+/* GAME OVER */
 #game-over-screen {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -273,5 +260,9 @@ body {
     align-items: center;
     z-index: 999;
 }
-.game-over-content { text-align: center; color: var(--red); }
-.game-over-content img { width: 80%; max-width: 300px; border-radius: 15px; margin-bottom: 20px; }
+
+.game-over-content { text-align: center; }
+.game-over-content h2 { color: var(--red); font-size: 2.5rem; margin-top: 20px; }
+
+/* UTILS */
+.hidden { display: none !important; }
