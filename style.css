@@ -121,7 +121,6 @@ body {
     transition: all 0.2s;
 }
 
-/* Spezifische Anordnung: Erster und letzter Button volle Breite */
 .category-grid button:first-child,
 .category-grid button:last-child {
     grid-column: span 2;
@@ -191,7 +190,7 @@ body {
     font-size: 1.2rem;
     padding: 12px 0;
     border-radius: 10px;
-    width: calc(14.28% - 5px); /* 7 Tasten pro Reihe */
+    width: calc(14.28% - 5px); 
     cursor: pointer;
 }
 
@@ -230,14 +229,15 @@ body {
 
 .action-row button:active { transform: scale(0.95); }
 
-/* FEEDBACK FLASH */
+/* FEEDBACK FLASH (Repariert: max-width auf App-Größe begrenzt!) */
 #feedback-flash { 
     position: absolute; 
     top: 40%; 
     left: 50%; 
     transform: translate(-50%, -50%);
     z-index: 100; 
-    width: 80%;
+    width: 90%;
+    max-width: 400px; /* HIER IST DER FIX */
     padding: 25px;
     border-radius: 20px;
     text-align: center;
