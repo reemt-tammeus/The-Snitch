@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GrammarGrinder - Reported Speech</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        
+        <header id="stats-bar" class="hidden">
+            <button id="btn-back" onclick="AppDirector.goBack()">⬅️</button>
+            <div id="lives"></div>
+            <div id="streak-display">🔥 <span id="streak-count">0</span></div>
+        </header>
+
+        <main id="content-area">
+            <section data-screen="menu" class="blueprint-screen nav-mode active">
+                <div class="glass-box">
+                    <h2 id="menu-title">Reported Speech</h2>
+                    <p style="font-size: 0.8rem; margin-bottom: 15px; opacity: 0.7;">Wähle eine Kategorie zum Trainieren:</p>
+                    <div id="menu-grid" class="category-grid">
+                        </div>
+                </div>
+            </section>
+
+            <section data-screen="playing" class="blueprint-screen game-mode">
+                <div id="playing-glass-box" class="glass-box">
+                    <div id="progress-bar"></div>
+                    <div id="text-display">Lade Aufgabe...</div>
+                </div>
+            </section>
+
+            <section data-screen="continue" class="blueprint-screen nav-mode">
+                <div class="glass-box">
+                    <h2>Block geschafft! 🎯</h2>
+                    <p>Möchtest du weitermachen oder deine Kategorie wechseln?</p>
+                    <div class="mode-selection" style="margin-top: 20px;">
+                        <button class="action-btn" onclick="AppDirector.continueGame()">Nächste 10 Sätze</button>
+                        <button class="action-btn secondary" onclick="AppDirector.goBack()">Menü</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer id="thumb-zone" class="hidden">
+            <div id="input-controls">
+                </div>
+        </footer>
+
+    </div>
+
+    <div id="feedback-flash" class="hidden"></div>
+    
+    <div id="game-over-screen" class="hidden">
+        <div class="game-over-content">
+            <img src="loser.jpg" alt="Game Over">
+            <h2>GAME OVER</h2>
+            <p>Die Zeitform war wohl zu stark...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
