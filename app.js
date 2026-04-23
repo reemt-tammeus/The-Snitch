@@ -44,6 +44,7 @@ async function startApp(category) {
         state.category = category;
         state.rawPool = [];
 
+        // Mix-Mode ohne Backshift
         if (category === "Mix-Mode") {
             Object.entries(data).forEach(([key, arr]) => {
                 if (Array.isArray(arr) && key !== "Backshift of Time") {
@@ -105,6 +106,7 @@ function renderDisplay() {
     const display = document.getElementById('text-display');
     const task = state.currentTask;
 
+    // Lückentext für Backshift
     if (state.category === "Backshift of Time" && task.suffix) {
         display.innerHTML = `
             <div style="font-style: italic; color: #aaa; margin-bottom: 10px;">"${task.direct}"</div>
@@ -117,11 +119,13 @@ function renderDisplay() {
             </div>
         `;
     } else {
+        // HINTS
         let hintHTML = "";
         if (task.hint) {
             hintHTML = `<div style="color: #888; font-family: monospace; letter-spacing: 1.5px; font-size: 1.2rem; margin-bottom: 5px;">${task.hint}</div>`;
         }
 
+        // WARM-UP HINWEIS
         let instructionHTML = "";
         if (state.category === "Statements - Warm-Up-Mode") {
             instructionHTML = `<div style="font-size: 0.85rem; color: #ffc107; margin-top: 12px; font-weight: normal; font-style: italic;">
@@ -141,7 +145,7 @@ function renderDisplay() {
     }
 }
 
-// PERFEKTES QWERTY ON-SCREEN KEYBOARD LOGIK
+// PERFEKTES QWERTY KEYBOARD
 function renderKeyboard() {
     const zone = document.getElementById('input-controls');
     zone.innerHTML = ""; 
@@ -149,7 +153,6 @@ function renderKeyboard() {
     const kbContainer = document.createElement('div');
     kbContainer.id = "keyboard";
     
-    // QWERTY Layout Rows (Inkl. Enter-Taste in Reihe 3)
     const rows = [
         ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
         ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
@@ -163,7 +166,7 @@ function renderKeyboard() {
         row.forEach(key => {
             const btn = document.createElement('button');
             if (key === 'check') {
-                btn.innerHTML = "↵"; // Enter-Symbol
+                btn.innerHTML = "↵";
                 btn.className = "kb-key kb-check";
                 btn.onclick = () => checkAnswer();
             } else {
@@ -176,7 +179,6 @@ function renderKeyboard() {
         kbContainer.appendChild(rowDiv);
     });
 
-    // ACTION ROW (Space und Backspace in Reihe 4)
     const actionRow = document.createElement('div');
     actionRow.className = "kb-row row-4";
     
@@ -197,7 +199,7 @@ function renderKeyboard() {
     zone.appendChild(kbContainer);
 }
 
-// HARDWARE KEYBOARD SUPPORT (Für PC-Tester)
+// HARDWARE KEYBOARD SUPPORT
 window.addEventListener('keydown', (e) => {
     if (state.locked || !document.querySelector('[data-screen="playing"]').classList.contains('active')) return;
     
@@ -236,6 +238,7 @@ function checkAnswer() {
         state.streak++;
         state.blockCounter++;
         
+        // GRÜNES LEUCHTEN
         const glassBox = document.getElementById('playing-glass-box');
         glassBox.classList.add('glow-green');
         
@@ -252,9 +255,9 @@ function checkAnswer() {
             setTimeout(() => {
                 document.getElementById('game-over-screen').classList.remove('hidden');
                 setTimeout(() => location.reload(), 3000);
-            }, 2500);
+            }, 2500); // Mehr Zeit vorm Tod
         } else {
-            setTimeout(loadNext, 4000); 
+            setTimeout(loadNext, 4000); // 4 Sekunden zum Fehler lesen
         }
     }
     updateStats();
@@ -272,10 +275,17 @@ function showFlash(m, c) {
     f.classList.remove('hidden');
 }
 
-// MENÜ START
+// MENÜ START MIT FADE-IN
 document.addEventListener('DOMContentLoaded', () => {
     const menuGrid = document.getElementById('menu-grid');
     menuGrid.innerHTML = ""; 
+
+    // Die 1,5 Sekunden Animation
+    const menuBox = document.querySelector('[data-screen="menu"] .glass-box');
+    if (menuBox) {
+        menuBox.classList.add('startup-fade');
+        setTimeout(() => menuBox.classList.remove('startup-fade'), 1600); 
+    }
 
     const categories = [
         "Backshift of Time",
